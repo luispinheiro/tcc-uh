@@ -4,36 +4,46 @@ $userName = "root";
 $password = "";
 $dbname = "tcc";
 
-
-$id = 5;
 try {
-  $conn = new PDO('mysql:host=$serverName;dbname=$dbname', $username, $password);
-  $stmt = $conn->prepare('SELECT * FROM sensores WHERE id = :id');
-  $stmt->execute(array('id' => $id));
-
-  $result = $stmt->fetchAll();
-
-  if ( count($result) ) {
-    foreach($result as $row) {
-      print_r($row);
-    }
-  } else {
-    echo "Nennhum resultado retornado.";
-  }
+  $conn = new PDO("mysql:host=$serverName;dbname=$dbname", $userName, $password);
+  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $erro) {
-    echo 'Falha da conexão com o banco de dados!: ' . $erro->getMessage();
+  echo 'Falha da conexão com o banco de dados!: ' . $erro->getMessage();
 }
 
- ?>
+?>
 
- <!DOCTYPE html>
- <html lang="en">
- <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
- </head>
- <body>
-    
- </body>
- </html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produtos</title>
+</head>
+<body>
+  <?php 
+      if(isset($_POST['btnCadastrar'])) {
+          $nome = $_POST['txtNome'];
+          $valor = $_POST['txtValor'];
+          $timestamp = $_POST['txtTimestamp'];
+          $cmdSql = 'INSERT INTO sensores(nome, valor, timestamp) VALUES (:nome, :valor, :timestamp)';
+      
+          $conn_pronta = $conn -> prepare($cmdSql);
+          $conn_pronta -> bindValue(":nome", $nome);
+          $conn_pronta -> bindValue(":valor", $valor);
+          $conn_pronta -> bindValue(":timestamp", $timestamp);
+          $conn_pronta -> execute();
+      }
+  ?>
+  <h1>Cadastrar produto</h1>
+  <form method="post" action="">
+      <input type="text" placeholder="Nome" name="txtNome">
+      <br>
+      <input type="number" placeholder="Valor" name="txtValor">
+      <br>
+      <input type="number" placeholder="Timestamp" name="txtTimestamp">
+      <br>
+      <input type="submit" value="Cadastrar" name="btnCadastrar">
+  </form>
+</body>
+</html>
